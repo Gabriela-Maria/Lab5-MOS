@@ -83,8 +83,7 @@ necesidades = {
 Model = ConcreteModel()
 
 # Variables de decisión
-Model.x = Var(A, R, Z, V, domain=NonNegativeReals)
-Model.x_enteros = Var(A, Z, V, domain=NonNegativeIntegers)
+Model.x = Var(A, R, Z, V, domain=NonNegativeIntegers)
 Model.usa_avion = Var(A, domain=Binary)
 Model.asignacion_zona = Var(A, V, Z, domain=Binary)
 
@@ -104,9 +103,9 @@ Model.obj = Objective(
 
 # Medicina no se transporta en el avion 1
 Model.res1 = ConstraintList()
-for i in A:
+for m in V:
     for k in Z:
-        Model.res1.add(expr=Model.x[i, "Medicinas", k, 1] == 0)
+        Model.res1.add(expr=Model.x[1, "Medicinas", k, m] == 0)
 
 # Equipos medicos y agua no pueden viajar en el mismo avion
 Model.res2 = ConstraintList()
@@ -119,15 +118,7 @@ for i in A:
                 == 0
             )
 
-# Dispositivos indivisibles los equipos medicos
-Model.res3 = ConstraintList()
-for i in A:
-    for k in Z:
-        for m in V:
-            Model.res3.add(
-                Model.x[i, "Equipos Medicos", k, m] == Model.x_enteros[i, k, m]
-            )
-
+"""
 # Cada avion va a unica zona de destino por viaje
 Model.res4 = ConstraintList()
 for i in A:
@@ -142,7 +133,13 @@ for i in A:
                             == 0
                         )
                     )
-
+"""
+Model.res4 = ConstraintList()
+for i in A:
+    for m in V:
+        Model.res4.add(
+            expr=sum(Model.asignacion_zona[i, m, k] for k in Z) <= 1
+        )
 
 # Avion no excede su capacidad en peso
 Model.res5 = ConstraintList()
@@ -183,6 +180,7 @@ for j in R:
         )
 
 # Funcion de minimizacion de costo
+
 Model.res9 = ConstraintList()
 Model.res9.add(
     expr=sum(costo_fijo[i] * Model.usa_avion[i] for i in A)
@@ -194,7 +192,6 @@ Model.res9.add(
     )
     <= 5000
 )
-
 # Configuracion Variable Usa Avion
 Model.res10 = ConstraintList()
 for i in A:
@@ -216,7 +213,11 @@ for i in A:
             )
 
 # Especificación del solver
-SolverFactory("ipopt").solve(Model)
+solver = SolverFactory(
+    'bonmin',
+    executable=r"C:\Users\maria\OneDrive\Escritorio\SextoSemestre\MOS\ampl.mswin64\bonmin.exe"
+).solve(Model, tee=True)
+
 
 # Imprimir resultados
 for i in A:
