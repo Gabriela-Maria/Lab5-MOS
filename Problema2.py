@@ -10,7 +10,7 @@ import random
 # Datos del problema
 ciudades = 10
 spread = 1.5
-vendedores = 2
+vendedores = 1
 nodos = [_ for _ in range(ciudades)]
 
 # Cargar datos del csv
