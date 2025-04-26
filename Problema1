@@ -213,10 +213,13 @@ for i in A:
             )
 
 # Especificación del solver
-solver = SolverFactory(
-    'bonmin',
-    executable=r"C:\Users\maria\OneDrive\Escritorio\SextoSemestre\MOS\ampl.mswin64\bonmin.exe"
-).solve(Model, tee=True)
+# solver = SolverFactory(
+#     'bonmin',
+#     executable=r"C:\Users\maria\OneDrive\Escritorio\SextoSemestre\MOS\ampl.mswin64\bonmin.exe"
+# ).solve(Model, tee=True)
+
+solver = SolverFactory('ipopt')
+solver.solve(Model, tee=True)
 
 
 # Imprimir resultados
